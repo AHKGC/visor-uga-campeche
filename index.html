@@ -128,32 +128,40 @@ aside.closed{display:none}
 
 /* ---------- ficha de la UGA, ancho completo ---------- */
 .ficha{flex:none;background:var(--surface);border-top:3px solid var(--guinda-7420);
-  max-height:46vh;overflow-y:auto;z-index:1000;display:none}
+  max-height:42vh;overflow-y:auto;z-index:1000;display:none;font-size:calc(12.5px * var(--fz,1))}
 .ficha.on{display:block}
+.ficha.tall{max-height:78vh}
 .fh{display:flex;align-items:center;gap:12px;padding:9px 15px;background:var(--verde-627);color:#F2EFE8;
-  position:sticky;top:0;z-index:2}
+  position:sticky;top:0;z-index:2;font-size:13px}
 .fh .k{font-family:var(--f-mono);font-size:16px;font-weight:600}
 .fh .pol{padding:2px 9px;border-radius:999px;font-size:11px;font-weight:600;background:rgba(255,255,255,.14)}
 .fh .grow{flex:1}
 .fh button{padding:4px 10px;border:1px solid rgba(188,169,134,.5);border-radius:5px;
   background:rgba(255,255,255,.08);color:#F2EFE8;font-size:11.5px}
-.ftbl{width:100%;border-collapse:collapse;font-size:12.5px}
-.ftbl th,.ftbl td{padding:6px 12px;text-align:left;border:1px solid var(--line);vertical-align:top}
-.ftbl th{background:var(--surface-2);font-family:var(--f-mono);font-size:9px;letter-spacing:.11em;
+.fh button:hover{background:rgba(255,255,255,.18)}
+.zoomg{display:flex;align-items:center;gap:4px;border-left:1px solid rgba(188,169,134,.3);padding-left:11px}
+.zoomg .zb{width:26px;padding:4px 0;text-align:center;font-weight:600}
+.zoomg .zv{font-family:var(--f-mono);font-size:10.5px;color:var(--beige);min-width:34px;text-align:center}
+.ftbl{width:100%;border-collapse:collapse;font-size:1em}
+.ftbl th,.ftbl td{padding:.42em .9em;text-align:left;border:1px solid var(--line);vertical-align:top}
+.ftbl th{background:var(--surface-2);font-family:var(--f-mono);font-size:.74em;letter-spacing:.11em;
   text-transform:uppercase;color:var(--ink-3);font-weight:600;white-space:nowrap;width:1%}
 .ftbl td{font-variant-numeric:tabular-nums}
 .ftbl tr.band th,.ftbl tr.band td{background:var(--verde-626);color:#F2EFE8;font-family:var(--f-mono);
-  font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;border-color:var(--verde-626)}
+  font-size:.76em;letter-spacing:.12em;text-transform:uppercase;font-weight:600;border-color:var(--verde-626)}
 .fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
 .fgrid > table{border-collapse:collapse;width:100%}
-.chips{display:flex;flex-wrap:wrap;gap:3px}
-.chip{font-family:var(--f-mono);font-size:10px;padding:2px 6px;border-radius:3px;font-weight:500}
+.chips{display:flex;flex-wrap:wrap;gap:.25em}
+.chip{font-family:var(--f-mono);font-size:.82em;padding:.15em .5em;border-radius:3px;font-weight:500;line-height:1.4}
+/* usos con nombre completo: tipografía de texto, no monoespaciada */
+.chip.n{font-family:var(--f-ui);font-size:.92em;padding:.2em .6em;font-weight:500}
+.chip.n .nc{font-family:var(--f-mono);font-size:.82em;opacity:.62;margin-left:.4em}
 .chip.c{background:var(--comp-soft);color:var(--comp)}
 .chip.d{background:var(--cond-soft);color:#96590A}
 .chip.i{background:var(--inc-soft);color:var(--inc)}
 .chip.e{background:var(--accent-soft);color:var(--verde-626)}
-.nota{background:var(--anp-soft);border-left:3px solid var(--anp);padding:7px 10px;font-size:12px}
-.prose{font-size:12.5px;color:var(--ink-2);line-height:1.5;max-width:110ch}
+.nota{background:var(--anp-soft);border-left:3px solid var(--anp);padding:.55em .8em;font-size:.95em}
+.prose{font-size:1em;color:var(--ink-2);line-height:1.55;max-width:112ch}
 
 /* ---------- popup ---------- */
 .leaflet-popup-content-wrapper{border-radius:7px;box-shadow:var(--shadow)}
@@ -210,8 +218,8 @@ aside.closed{display:none}
 .chip.k{background:var(--accent-soft);color:var(--verde-626);cursor:pointer;border:1px solid transparent}
 .chip.k:hover{border-color:var(--verde-626)}
 .chip.k.miss{background:var(--inc-soft);color:var(--inc)}
-.crisec{margin-bottom:7px}
-.crisec .csh{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;
+.crisec{margin-bottom:.55em}
+.crisec .csh{font-family:var(--f-mono);font-size:.76em;letter-spacing:.09em;text-transform:uppercase;
   color:var(--ink-3);font-weight:600;margin-bottom:3px}
 
 .lbl{font-family:var(--f-mono);font-size:10px;font-weight:600;color:#0B1F1A;
@@ -723,6 +731,23 @@ function clearSel(){ state.sel=null; repaint(); document.getElementById('ficha')
   hitsEl.querySelectorAll('.hit').forEach(function(b){ b.setAttribute('aria-current',false); });
   setTimeout(function(){map.invalidateSize();},30); }
 
+/* tamaño de la ficha: escala tipográfica y altura, recordadas en el navegador */
+function save(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+function load(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+state.fz = Math.min(1.8, Math.max(.7, parseFloat(load('ugaFz'))||1));
+state.tall = load('ugaTall')==='1';
+function applyFz(){
+  var el=document.getElementById('ficha');
+  el.style.setProperty('--fz', state.fz);
+  el.classList.toggle('tall', state.tall);
+  var z=document.getElementById('f-zval');
+  if(z) z.textContent=Math.round(state.fz*100)+'%';
+}
+function setFz(v){
+  state.fz=Math.min(1.8,Math.max(.7,Math.round(v*10)/10));
+  save('ugaFz',state.fz); applyFz(); setTimeout(function(){map.invalidateSize();},30);
+}
+
 function renderFicha(){
   var el=document.getElementById('ficha'); var u=UGAS[state.sel];
   if(!u){ el.classList.remove('on'); return; }
@@ -730,13 +755,19 @@ function renderFicha(){
   var comp=[],cond=[],inc=[];
   for(var k=0;k<NU;k++){ var v=u.u[k];
     if(v===1) comp.push(k); else if(v===2) cond.push(k); else if(v===0) inc.push(k); }
+  /* usos con su nombre completo; la clave queda como referencia discreta */
   function chips(arr,cls){ return arr.length? arr.map(function(k){
-      return '<span class="chip '+cls+'" title="'+esc(NAMES[k])+'">'+esc(CODES[k])+'</span>'; }).join('') : '—'; }
+      return '<span class="chip n '+cls+'">'+esc(NAMES[k])+'<span class="nc">'+esc(CODES[k])+'</span></span>'; }).join('') : '—'; }
   var I=u.ind;
   var h='<div class="fh"><span class="k">'+esc(u.k)+'</span>'
     +'<span class="pol" style="background:'+pp.hex+'">'+esc(u.pol)+'</span>'
     +'<span style="font-family:var(--f-mono);font-size:12px">'+ha(u.ha)+' ha · '+pct(u.ha/TOTAL*100)+'</span>'
-    +'<span class="grow"></span><button id="f-zoom">Centrar</button><button id="f-close">Cerrar ✕</button></div>';
+    +'<span class="grow"></span>'
+    +'<span class="zoomg"><button class="zb" id="f-menos" title="Reducir la ficha">A−</button>'
+    +'<span class="zv" id="f-zval"></span>'
+    +'<button class="zb" id="f-mas" title="Agrandar la ficha">A+</button>'
+    +'<button id="f-alto" title="Alternar entre ficha compacta y ficha alta">Altura</button></span>'
+    +'<button id="f-zoom">Centrar</button><button id="f-close">Cerrar ✕</button></div>';
 
   h+='<div class="fgrid">'
    +'<table class="ftbl"><tr class="band"><td colspan="2">Identificación</td></tr>'
@@ -816,8 +847,14 @@ function renderFicha(){
   }
 
   el.innerHTML=h; el.classList.add('on');
+  applyFz();
   document.getElementById('f-close').onclick=clearSel;
   document.getElementById('f-zoom').onclick=function(){ select(state.sel,true); };
+  document.getElementById('f-menos').onclick=function(){ setFz(state.fz-.1); };
+  document.getElementById('f-mas').onclick=function(){ setFz(state.fz+.1); };
+  document.getElementById('f-alto').onclick=function(){
+    state.tall=!state.tall; el.classList.toggle('tall',state.tall);
+    save('ugaTall',state.tall?'1':'0'); setTimeout(function(){map.invalidateSize();},30); };
   el.onclick=function(ev){
     var b=ev.target.closest('[data-cri]');
     if(b) openCri(b.dataset.cri);
